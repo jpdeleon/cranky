@@ -16,7 +16,7 @@ import centroidfit
 import periodfinder
 
 
-def run(starname='',outputpath='',inputpath='',makelightcurve=True, find_transits=True,campaign=1,chunksize=300,cutoff_limit=2.):
+def run(starname='',outputpath='',inputpath='',makelightcurve=True, find_transits=True,chunksize=300,cutoff_limit=2.):#,campaign=1):
   # Takes strings with the EPIC number of the star and input/outputpath. Campaign number is used to complete the correct filename as downloaded from MAST
   # Set makelightcurve or find_transits to False to run only partial
 
@@ -24,7 +24,7 @@ def run(starname='',outputpath='',inputpath='',makelightcurve=True, find_transit
 
   if makelightcurve:
     # makes raw light curve from pixel file0
-    t,f_t,Xc,Yc = pixeltoflux.gotoflux(starname,outputpath=outputpath,inputpath=inputpath,campaign=campaign,cutoff_limit=cutoff_limit)
+    t,f_t,Xc,Yc = pixeltoflux.gotoflux(starname,outputpath=outputpath,inputpath=inputpath,cutoff_limit=cutoff_limit)#,campaign=campaign)
 
     # removes outlying data points where thrusters are fired
     t,f_t,Xc,Yc = centroidfit.find_thruster_events(t,f_t,Xc,Yc,starname=starname,outputpath=outputfolder)
@@ -49,5 +49,3 @@ def run(starname='',outputpath='',inputpath='',makelightcurve=True, find_transit
 
   pl.show() # comment out to keep things running for multiple stars
   pl.close('all')
-
-

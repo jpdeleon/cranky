@@ -18,7 +18,7 @@ while i < len(starnames):
   print str(i)
 
   try:
-    run(starnames[i],outputpath=outputpath,inputpath=inputpath,makelightcurve=True,campaign=1)
+    run(starnames[i],outputpath=outputpath,inputpath=inputpath,makelightcurve=True)#,campaign=1)
 
   except Exception as inst:
     print inst

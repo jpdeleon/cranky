@@ -9,7 +9,11 @@
 import os
 import matplotlib.pyplot as pl
 import numpy as np
-import pyfits
+try:
+    from astropy.io import fits as pyfits
+except:
+    import pyfits
+
 import matplotlib as mpl
 from matplotlib.colors import LogNorm
 from scipy.ndimage import measurements
@@ -22,7 +26,9 @@ from auxiliaries import *
 def get_pixelfluxes(filename,inputfolder='',outputfolder='',starname=''):
   # Read a pixel file, and return the flux per pixel over time
 
-  pixfile = pyfits.open(inputfolder+filename,memmap=True)  # open a FITS file
+  #pixfile = pyfits.open(inputfolder+filename,memmap=True)  # open a FITS file
+  pixfile=pyfits.open(os.path.join(inputfolder,filename))
+
   #print f.info()
   L=len(pixfile[1].data) # number of images
 
@@ -43,7 +49,7 @@ def get_pixelfluxes(filename,inputfolder='',outputfolder='',starname=''):
 
 
   # read dates and fluxes
-  dates= []
+  '''dates= []
   fluxes = []
   i = 0
   while i < L:
@@ -59,7 +65,12 @@ def get_pixelfluxes(filename,inputfolder='',outputfolder='',starname=''):
     fluxes.append(flux) # array over time of 2D array of flux-per-pixel
 
     i = i +1
-  #print dates,fluxes
+  #print dates,fluxes'''
+
+  rec = pixfile[1].data
+  dates=rec.TIME
+  fluxes=rec.RAW_CNTS
+
   return dates,fluxes,kepmag,Xabs,Yabs
 
 
@@ -81,7 +92,7 @@ def plot_pixelimages(dates,fluxes,outputfolder=''):
     i = i + 1
 
 
-def find_aperture(dates,fluxes,plot=True,starname='',outputfolder='',kepmag='na',cutoff_limit=2.):
+def find_aperture(dates,fluxes,plot=True,starname='',outputfolder='',kepmag='na',cutoff_limit=1.):
   #
   # This definition reads a 2D array of fluxes (over time) and creates an aperture mask which can later be used to select those pixels for inclusion in light curve
   #
@@ -288,13 +299,15 @@ def remove_known_outliers(t,f_t,Xc,Yc):
 
 
 
-def gotoflux(starname,outputpath='',inputpath='',campaign=2,cutoff_limit=2.):
+def gotoflux(starname,outputpath='',inputpath='',cutoff_limit=2.):#,campaign=2):
   '''
   Read a specific pixel file and extract a light curve from it
   '''
 
 
-  filename = 'ktwo' + starname + '-c0' + str(campaign) + '_lpd-targ.fits' # filename as downloaded from MAST
+  #filename = 'ktwo' + starname + '-c0' + str(campaign) + '_lpd-targ.fits' # filename as downloaded from MAST
+  filename = 'ktwo' + starname + '-kadenza-lpd-targ.fits'
+
   outputfolder = os.path.join(outputpath,str(starname))
   if not os.path.exists(outputfolder):
     os.makedirs(outputfolder)
