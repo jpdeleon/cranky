@@ -1,6 +1,6 @@
 # k2photometry 2
 
-This code was forked from [V. Van Eylen](https://github.com/vincentvaneylen/k2photometry) used to read, reduce and detrend K2 photometry. 
+This code was forked from [V. Van Eylen](https://github.com/vincentvaneylen/k2photometry). This pipeline is used to read, reduce and detrend K2 photometry. 
 
 ## Installation
 
