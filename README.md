@@ -7,9 +7,9 @@ This code was forked from [V. Van Eylen](https://github.com/vincentvaneylen/k2ph
 Clone the source code from the [GitHub repository](https://github.com/jpdeleon/k2photometry) and install using the standard python tools:
 
 ```bash
-    git clone https://github.com/dfm/python-bls.git
-    cd python-bls
-    python setup.py install
+git clone https://github.com/jpdeleon/k2photometry.git
+cd k2photometry
+python setup.py install
 ```
 
 ## Quick test
