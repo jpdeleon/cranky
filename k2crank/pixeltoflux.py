@@ -117,25 +117,24 @@ def find_aperture(dates,fluxes,starname='',outputfolder='',kepmag='na',cutoff_li
 
   outline = make_aperture_outline(aperture[0]) # a new outline (ONLY for figure)
 
-  if showfig: # make aperture figure
-    cmap = mpl.cm.get_cmap('Greys', 20)
-    pl.figure('Aperture_' + str(starname))
-    pl.imshow(flux,norm=LogNorm(),interpolation="none")#,cmap=cmap)
-    pl.plot(outline_all[:, 0], outline_all[:, 1],color='green', zorder=10, lw=2.5)
-    pl.plot(outline[:, 0], outline[:, 1],color='red', zorder=10, lw=2.5)#,label=str(kepmag))
-
-    #pl.colorbar(orientation='vertical')
-    pl.xlabel('X',fontsize=15)
-    pl.ylabel('Y',fontsize=15)
-    pl.legend()
-    #pl.xlim([-1,18])
-    #pl.ylim([-1,16])
-    #pl.xticks([0,5,10,15])
-    #pl.yticks([0,5,10,15])
-    pl.tight_layout()
-    pl.savefig(os.path.join(outputfolder,'aperture_' + str(starname)+'.pdf'))
-    #pl.close()
-    #pl.show()
+  #if showfig: # make aperture figure
+  cmap = mpl.cm.get_cmap('Greys', 20)
+  pl.figure('Aperture_' + str(starname))
+  pl.imshow(flux,norm=LogNorm(),interpolation="none")#,cmap=cmap)
+  pl.plot(outline_all[:, 0], outline_all[:, 1],color='green', zorder=10, lw=2.5)
+  pl.plot(outline[:, 0], outline[:, 1],color='red', zorder=10, lw=2.5)#,label=str(kepmag))
+  #pl.colorbar(orientation='vertical')
+  pl.xlabel('X',fontsize=15)
+  pl.ylabel('Y',fontsize=15)
+  pl.legend()
+  #pl.xlim([-1,18])
+  #pl.ylim([-1,16])
+  #pl.xticks([0,5,10,15])
+  #pl.yticks([0,5,10,15])
+  pl.tight_layout()
+  pl.savefig(os.path.join(outputfolder,'aperture_' + str(starname)+'.pdf'))
+  #pl.close()
+  #pl.show()
   return aperture
 
 def estimate_background(dates,fluxes,aperture,outputfolder='',starname=''):
@@ -239,24 +238,23 @@ def get_lightcurve(dates,fluxes,aperture,starname='',outputfolder='',Xabs=0,Yabs
   Xc = np.array(Xc) + Xabs
   Yc = np.array(Yc) + Yabs
 
-  if showfig:
-    # plot flux and centroid curve
-    g, (ax1, ax2, ax3) = pl.subplots(3, sharex='col', num='timeseries_'+str(starname))
-    ax1.plot(np.array(dates)[f_t>0],f_t[f_t>0],'*') # little hack to avoid values 0 that will skew the plot, but they are not (yet) removed from the LC
-    ax1.set_ylabel('Flux [count]')
-    ax2.plot(dates,Xc,'*')
-    ax2.set_ylabel('Xc')
-    ax3.plot(dates,Yc,'*')
-    ax3.set_ylabel('Yc')
-    ax3.set_xlabel('Time [d]')
-    g.savefig(os.path.join(outputfolder,'flux_centroids_' + str(starname) + '.png'))
-    #pl.show()
-
-    pl.figure('Raw data')
-    pl.plot(np.array(dates)[f_t>0],f_t[f_t>0],'.',color='grey')
-    pl.xlabel('Time [d]')
-    pl.ylabel('Flux [count]')
-    pl.savefig(os.path.join(outputfolder,'raw_data_' + str(starname) + '.png'))
+  #if showfig:
+  # plot flux and centroid curve
+  g, (ax1, ax2, ax3) = pl.subplots(3, sharex='col', num='timeseries_'+str(starname))
+  ax1.plot(np.array(dates)[f_t>0],f_t[f_t>0],'*') # little hack to avoid values 0 that will skew the plot, but they are not (yet) removed from the LC
+  ax1.set_ylabel('Flux [count]')
+  ax2.plot(dates,Xc,'*')
+  ax2.set_ylabel('Xc')
+  ax3.plot(dates,Yc,'*')
+  ax3.set_ylabel('Yc')
+  ax3.set_xlabel('Time [d]')
+  g.savefig(os.path.join(outputfolder,'flux_centroids_' + str(starname) + '.png'))
+  #pl.show()
+  pl.figure('Raw data')
+  pl.plot(np.array(dates)[f_t>0],f_t[f_t>0],'.',color='grey')
+  pl.xlabel('Time [d]')
+  pl.ylabel('Flux [count]')
+  pl.savefig(os.path.join(outputfolder,'raw_data_' + str(starname) + '.png'))
   return [dates,f_t,Xc,Yc]
 
 

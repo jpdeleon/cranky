@@ -30,6 +30,8 @@ parser.add_argument('--indir', help='path to fits file directory',
     type=str, default='./')
 parser.add_argument('--outdir', help='output directory (default: output/)',
     type=str, default='output/')
+parser.add_argument('--cutoff_limit', help='parameter for aperture size (default: 1.2)',
+    type=float, default=1.2)
 parser.add_argument('--showfig', help='show all plots (default: True)',
     type=str2bool, default=True)
 
@@ -37,6 +39,7 @@ args = parser.parse_args()
 
 inputpath = args.indir
 outputpath = args.outdir
+cutoff_limit = args.cutoff_limit
 showfig = args.showfig
 
 
@@ -56,7 +59,7 @@ while i < len(starnames):
   print(str(i))
 
   try:
-    run(starnames[i],outputpath=outputpath,inputpath=inputpath,makelightcurve=True, showfig=showfig)#,campaign=14)
+    run(starnames[i],outputpath=outputpath,inputpath=inputpath,cutoff_limit=cutoff_limit,makelightcurve=True, showfig=showfig)#,campaign=14)
 
   except Exception as inst:
     print inst

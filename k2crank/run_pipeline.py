@@ -16,7 +16,7 @@ import centroidfit
 import periodfinder
 
 
-def run(starname='',outputpath='',inputpath='',makelightcurve=True, find_transits=True,chunksize=300,cutoff_limit=1., showfig=None):#,campaign=1):
+def run(starname='',outputpath='',inputpath='',makelightcurve=True, find_transits=True,chunksize=300,cutoff_limit=1.1, showfig=None):#,campaign=1):
   # Takes strings with the EPIC number of the star and input/outputpath. Campaign number is used to complete the correct filename as downloaded from MAST
   # Set makelightcurve or find_transits to False to run only partial
 
