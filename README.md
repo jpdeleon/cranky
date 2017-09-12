@@ -10,6 +10,9 @@ Edited `pixeltoflux()` and `run_pipeline()`
 * uses astropy.io.fits instead of pyfits
 
 To do:
-* improve sigma clipping and centroiding 
+* improve sigma clipping and centroiding
 
+Additional requirements:
+* [bls](https://github.com/dfm/python-bls)
+* [lmfit](https://github.com/lmfit/lmfit-py/)
 
