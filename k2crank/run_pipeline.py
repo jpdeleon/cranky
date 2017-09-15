@@ -49,6 +49,6 @@ def run(inputpath='',outputpath='',makelightcurve=True, find_transits=True,chunk
 
     periodfinder.make_combo_figure(t,f_t,period,freqlist,powers,starname=starname,outputpath=outputpath)
 
-  if showfig and showfig is not None:
+  if showfig:
     pl.show() # comment out to keep things running for multiple stars
   pl.close('all')

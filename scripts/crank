@@ -9,18 +9,6 @@ import argparse
 
 from k2crank.run_pipeline import run
 
-def str2bool(v):
-    '''
-    see https://stackoverflow.com/questions/15008758/parsing-boolean-values-with-argparse
-    '''
-    if v.lower() in ('yes', 'true', 't', 'y', '1'):
-        return True
-    elif v.lower() in ('no', 'false', 'f', 'n', '0'):
-        return False
-    else:
-        raise argparse.ArgumentTypeError('Boolean value expected.')
-
-
 parser = argparse.ArgumentParser(description="""
                 read, reduce and detrend K2 photometry""",
                 usage='use "%(prog)s --help" for more information',
@@ -31,8 +19,8 @@ parser.add_argument('--o', help='output directory (default: output/)',
     type=str, default='output/')
 parser.add_argument('--cutoff_limit', help='parameter for aperture size (default: 1.2)',
     type=float, default=1.2)
-parser.add_argument('--showfig', help='show all plots (default: True)',
-    type=str2bool, default=True)
+parser.add_argument('--showfig', help='show all plots',
+    type=bool, default=False)
 
 args = parser.parse_args()
 
