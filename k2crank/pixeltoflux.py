@@ -23,11 +23,10 @@ from auxiliaries import *
 
 
 
-def get_pixelfluxes(filename,inputfolder='',outputfolder='',starname=''):
+def get_pixelfluxes(inputfolder='',outputfolder='',starname=''):
   # Read a pixel file, and return the flux per pixel over time
 
-  #pixfile = pyfits.open(inputfolder+filename,memmap=True)  # open a FITS file
-  pixfile=pyfits.open(os.path.join(inputfolder,filename))
+  pixfile=pyfits.open(os.path.join(inputfolder))
 
   #print f.info()
   L=len(pixfile[1].data) # number of images
@@ -295,21 +294,19 @@ def remove_known_outliers(t,f_t,Xc,Yc):
 
 
 
-def gotoflux(starname,outputpath='',inputpath='',cutoff_limit=2., showfig=None):#,campaign=2):
+def gotoflux(inputpath='',outputpath='',cutoff_limit=2., showfig=None):#,campaign=2):
   '''
   Read a specific pixel file and extract a light curve from it
   '''
 
-
-  #filename = 'ktwo' + starname + '-c0' + str(campaign) + '_lpd-targ.fits' # filename as downloaded from MAST
-  filename = 'ktwo' + starname + '-kadenza-lpd-targ.fits'
+  starname = inputpath.split('/')[-1].split('-')[0][4:-1]
 
   outputfolder = os.path.join(outputpath,str(starname))
   if not os.path.exists(outputfolder):
     os.makedirs(outputfolder)
 
   # Read fluxes per (X,Y) over time
-  dates,fluxes,kepmag,Xabs,Yabs = get_pixelfluxes(filename,inputfolder=inputpath,outputfolder=outputfolder,starname=starname)
+  dates,fluxes,kepmag,Xabs,Yabs = get_pixelfluxes(inputfolder=inputpath,outputfolder=outputfolder,starname=starname)
 
   # Define aperture
   aperture = find_aperture(dates,fluxes,starname=starname,outputfolder=outputfolder,kepmag=kepmag,cutoff_limit=cutoff_limit,showfig=None)
