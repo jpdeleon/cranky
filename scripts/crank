@@ -13,13 +13,13 @@ parser = argparse.ArgumentParser(description="""
                 read, reduce and detrend K2 photometry""",
                 usage='use "%(prog)s --help" for more information',
                 formatter_class=argparse.RawTextHelpFormatter)
-parser.add_argument('--i', help='path to file',
+parser.add_argument('-i', help='path to file',
     type=str, default='./')
-parser.add_argument('--o', help='output directory (default: output/)',
+parser.add_argument('-o', help='output directory (default: output/)',
     type=str, default='output/')
-parser.add_argument('--cutoff_limit', help='parameter for aperture size (default: 1.2)',
+parser.add_argument('-cutoff_limit', help='parameter for aperture size (default: 1.2)',
     type=float, default=1.2)
-parser.add_argument('--showfig', help='show all plots',
+parser.add_argument('-showfig', help='show all plots',
     type=bool, default=False)
 
 args = parser.parse_args()
