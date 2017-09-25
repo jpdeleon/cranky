@@ -26,13 +26,13 @@ parser.add_argument('-i', help='path to file',
     type=str, default='./')
 parser.add_argument('-o', help='output directory (default: output/)',
     type=str, default='output2/')
-parser.add_argument('-name', help='star name',
-    type=str, default='', required=True)
+#parser.add_argument('-name', help='star name',
+#    type=str, default='', required=True)
 parser.add_argument('-showfig', help='show all plots',action='store_true',default=False)
 
 args = parser.parse_args()
 outputpath = args.o
-starname=args.name
+#starname=args.name
 showfig=args.showfig
 
 if isfile(args.i):
@@ -41,6 +41,8 @@ else:
     print('{} does not exist'.format(args.i))
     sys.exit()
 
+starname=inputpath.split('/')[-1].split('_')[-1].split('.')[0]
+print(starname)
 outputfolder=join(outputpath,starname)
 
 if exists(outputfolder):
@@ -52,7 +54,10 @@ if exists(outputfolder):
 else:
     makedirs(outputfolder)
 
-print('Checking {}'.format(starname))
+print('\n-----------------------')
+print('Analyzing {}'.format(starname))
+print('-----------------------\n')
+
 try:
   lc = np.loadtxt(inputpath,comments='#',delimiter=' ')
 
@@ -87,11 +92,12 @@ try:
   #import pdb; pdb.set_trace()
 
   print('estimating transit parameters')
-  opt=fit_folded_lc(initial, args, method='powell')
+  method='powell'
+  opt=fit_folded_lc(initial, args, method=method)
   plot_fit(opt.x,t,f,outputfolder=outputfolder,starname=starname)
 
   #combo figure
-  folded,t_folded,period,freqlist,powers = get_period(t,f,outputpath=outputpath,starname=starname)
+  folded,t_folded,period,freqlist,powers = get_period(t,f,opt.x,get_mandelagolmodel=False,outputpath=outputpath,starname=starname)
 
   np.savetxt(join(outputpath, starname+'/powerspectrum_' + str(starname) + '.txt'),np.transpose([freqlist,powers]),header='Frequencies, Powers')
 
@@ -103,6 +109,13 @@ except Exception as inst:
 if showfig:
   pl.show() # comment out to keep things running for multiple stars
 pl.close('all')
+
+names='k,t0,p,a,i,u1,u2,sig,c0,c1,c2,c3'.split(',')
+head = 'optimized values: MLE ({})\n {}'.format(method,names)
+fname=join(outputpath,starname,'optimized_params_' + str(starname) + '.txt')
+#import pdb; pdb.set_trace()
+np.savetxt(fname,opt.x,header=head,fmt='%f')
+print('Saved: {}'.format(fname))
 
 #fname='parameter_' + starname + '.txt'
 #np.savetxt(fname,opt.x,comments=str(initial))

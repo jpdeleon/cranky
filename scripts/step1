@@ -78,7 +78,7 @@ try:
   #detrended lc
   print('detrending data')
   t_rbf,f_rbf=plot_rbf(t,f,f_rbf,outputfolder=outputfolder)
-  head = '# detrended lc with Rbf ({}, {})\n #t, f'.format(function,smooth)
+  head = 'detrended lc with Rbf ({}, {})\nt, f'.format(function,smooth)
   fname=join(outputpath,starname,'detrended_lc_' + str(starname) + '.txt')
   np.savetxt(fname,np.c_[t_rbf,f_rbf],header=head,fmt='%f')
   print('Saved: {}'.format(fname))

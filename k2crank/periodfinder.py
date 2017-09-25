@@ -26,9 +26,11 @@ def fold_data(t,y,period):
   return t_folded,y_folded
 
 
-def get_period(t,f_t,get_mandelagolmodel=True,outputpath='',starname=''):
+def get_period(t,f_t,params,get_mandelagolmodel=True,outputpath='',starname=''):
+  print(params)
   #
-  # here we use a BLS algorithm to create a periodogram and find the best periods. The BLS is implemented in Python by Ruth Angus and Dan Foreman-Macey
+  # here we use a BLS algorithm to create a periodogram and find the best periods.
+  # The BLS is implemented in Python by Ruth Angus and Dan Foreman-Mackey
   #
 
   outputfolder = os.path.join(outputpath,str(starname))
@@ -57,7 +59,8 @@ def get_period(t,f_t,get_mandelagolmodel=True,outputpath='',starname=''):
 
   folded,f_t_folded = fold_data(t,f_t,period)
 
-  np.savetxt(os.path.join(outputfolder, 'folded_P' + str(period) + 'star_' + str(starname) + '.txt'),np.transpose([folded,f_t_folded]),header='Time, Flux')
+  np.savetxt(os.path.join(outputfolder, 'folded_P' + str(period) + 'star_' + str(starname) + '.txt'),
+                        np.transpose([folded,f_t_folded]),header='Time, Flux')
 
   t_foldbin,f_t_foldbin,stdv_foldbin = rebin_dataset(folded,f_t_folded,15)
   f_t_smooth = savitzky_golay(f_t_folded,29,1)
@@ -70,24 +73,33 @@ def get_period(t,f_t,get_mandelagolmodel=True,outputpath='',starname=''):
     # this is not a core part of the module and uses a transit model by Mandel & Agol, implemented in Python by Ian Crossfield.
 
     #[T0,b,R_over_a,Rp_over_Rstar,flux_star,gamma1,gamma2]
-    transit_params = np.array([4.11176,0.9,0.104,np.sqrt(0.0036),1.,0.2,0.2])
+    #transit_params = np.array([3073.97854305,0.1,0.104,0.095118,1.,0.2,0.2])
+    #import pdb; pdb.set_trace()
+    k,t0,p,a_scaled,i,u1,u2,sig,c0,c1,c2,c3=params
+    b=0.1
+    flux_star = 1.0
+    Rstar=1.0 #solar-radius
+    a=Rstar/a_scaled
+    transit_params = np.array([t0,0.1,a,k,1.0,u1,u2])
+
+    print(transit_params)
+
     import model_transits
     times_full = np.linspace(0.,period,10000)
     model = model_transits.modeltransit(transit_params,model_transits.occultquad,period,times_full)
 
     pl.figure('Transit model')
-    pl.scatter((folded-transit_params[0])*24.,f_t_folded+1.,color='black',label='K2 photometry',s=10.)
+    pl.scatter((folded-transit_params[0]),f_t_folded+1.,color='black',label='K2 photometry',s=10.)
 
-    pl.plot((times_full-transit_params[0])*24.,model,color='grey',lw=4,label='Transit model')
+    pl.plot((times_full-transit_params[0]),model,color='grey',lw=4,label='Transit model')
     pl.xlabel('Time from mid-transit [hr]',fontsize=17)
     pl.ylabel('Relative flux',fontsize=17)
-    legend = pl.legend(loc='upper center',numpoints=1,scatterpoints=1,fontsize=15,prop={'size':15},title='EPIC 205071984')
+    legend = pl.legend(loc='best',numpoints=1,scatterpoints=1,fontsize=15,prop={'size':15},title=starname)
     pl.tick_params(labelsize=17)
     pl.tick_params(axis='both', which='major', width=1.5)
-
     pl.tight_layout()
     pl.setp(legend.get_title(),fontsize=17)
-  pl.savefig(os.path.join(outputfolder, 'folded_P_' + 'star_' + str(starname) +str(period) + '.png'))
+  #pl.savefig(os.path.join(outputfolder, 'folded_P_' + str(starname) + '.png'))
 
   # unravel again
   n_start = int(np.round(t[0] / period))
@@ -156,7 +168,7 @@ def make_combo_figure(t,f_t,period,freqs,power,starname='',outputpath=''):
   ax1.plot(t,f_t,'.-')
 
   ax2.plot(t,f_t,'.-.',lw=0.5)
-  ax2.set_ylim([-0.002,0.002])
+  #ax2.set_ylim([-0.002,0.002])
   ax2.set_xlabel('Time [d]')
 
   P_min = freqs[-1]

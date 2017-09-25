@@ -8,7 +8,7 @@ Clone the source code from the [GitHub repository](https://github.com/jpdeleon/c
 
 ```bash
 git clone https://github.com/jpdeleon/cranky.git
-cd k2photometry
+cd cranky
 python setup.py install
 ```
 
@@ -28,7 +28,7 @@ Outputs are saved in `output1` folder by default unless specified in `-o`.
 `step2` does simple phase-folding and parameter inference using MLE. The input comes from `step1` output: `*detrended_lc_<starname>.txt` which containes (time,flux,x,y).
 
 ```bash
-$ step2 -i '/output/starname/*detrended_lc_<starname>.txt' -name 24866269
+$ step2 -i '/output/starname/*detrended_lc_<starname>.txt'
 ```
 
 ## Notes
