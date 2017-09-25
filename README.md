@@ -4,7 +4,7 @@ This code was forked from [V. Van Eylen](https://github.com/vincentvaneylen/k2ph
 
 ## Installation
 
-Clone the source code from the [GitHub repository](https://github.com/jpdeleon/k2photometry) and install using the standard python tools:
+Clone the source code from the [GitHub repository](https://github.com/jpdeleon/cranky) and install using the standard python tools:
 
 ```bash
 git clone https://github.com/jpdeleon/cranky.git
@@ -19,15 +19,16 @@ To run, specify at least the path to the data directory, `-i`. `showfig` is a fl
 For simple sigma clipping and detrending, 
 
 ```bash
-$ step1 -i 'path/to/data/*.fits.gz' -showfig
+$ step1 -i '/path/to/data/*.fits.gz' -showfig
 ```
 
-Outputs are saved in `output1` folder unless specified in `-o`.
+Outputs are saved in `output1` folder by default unless specified in `-o`.
 
-For simple phase-folding and parameter inference using MLE, 
+
+`step2` does simple phase-folding and parameter inference using MLE. The input comes from `step1` output: `*detrended_lc_<starname>.txt` which containes (time,flux,x,y).
 
 ```bash
-$ step2 -i 'path/to/data/*.detrended_lc_*.txt' -name 24866269
+$ step2 -i '/output/starname/*detrended_lc_<starname>.txt' -name 24866269
 ```
 
 ## Notes
