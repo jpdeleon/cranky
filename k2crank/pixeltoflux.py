@@ -21,7 +21,8 @@ from scipy.ndimage import measurements
 # pipeline files
 from auxiliaries import *
 
-
+#cmap = mpl.cm.get_cmap('Greys', 20)
+cmap='viridis'
 
 def get_pixelfluxes(inputfolder='',outputfolder='',starname=''):
   # Read a pixel file, and return the flux per pixel over time
@@ -81,7 +82,7 @@ def plot_pixelimages(dates,fluxes,outputfolder=''):
     os.makedirs(folder)
   while i < len(dates):
     pl.figure(str(dates[i]))
-    pl.imshow(fluxes[i],norm=LogNorm(),interpolation="none")
+    pl.imshow(fluxes[i],norm=LogNorm(),interpolation="none",cmap=cmap)
     pl.colorbar(orientation='vertical')
     pl.xlabel('X')
     pl.ylabel('Y')
@@ -117,9 +118,8 @@ def find_aperture(dates,fluxes,starname='',outputfolder='',kepmag='na',cutoff_li
   outline = make_aperture_outline(aperture[0]) # a new outline (ONLY for figure)
 
   #if showfig: # make aperture figure
-  cmap = mpl.cm.get_cmap('Greys', 20)
   pl.figure('Aperture_' + str(starname))
-  pl.imshow(flux,norm=LogNorm(),interpolation="none")#,cmap=cmap)
+  pl.imshow(flux,norm=LogNorm(),interpolation="none",cmap=cmap)
   pl.plot(outline_all[:, 0], outline_all[:, 1],color='green', zorder=10, lw=2.5)
   pl.plot(outline[:, 0], outline[:, 1],color='red', zorder=10, lw=2.5)#,label=str(kepmag))
   #pl.colorbar(orientation='vertical')

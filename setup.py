@@ -30,7 +30,7 @@ else:
         return r
 
 setup(
-    name='k2photometry',
+    name='cranky',
     packages =['k2crank'],
     version="0.1.1",
     author='Jerome de Leon',
@@ -41,7 +41,7 @@ setup(
     long_description=rd("README.md") + "\n\n"
                     + "---------\n\n",
     package_dir={"k2photometry": "k2crank"},
-    scripts=['scripts/crank','scripts/crank2'],
+    scripts=['scripts/crank','scripts/step1','scripts/step2'],
     include_package_data=True,
     keywords=['k2','transit photometry'],
     classifiers = [

@@ -16,7 +16,8 @@ def plot_raw_lc(t,f,outputfolder='',starname=''):
     ax.plot(t, f, '.')
     ax.set_ylabel('Flux')
     ax.set_xlabel('Time (day)')
-    pl.savefig(join(outputfolder, 'raw_lc_' + str(starname) + '.png'))
+    #ax.set_title('working lc for planet finding: {}'.format(starname))
+    pl.savefig(join(outputfolder, 'working_lc_' + str(starname) + '.png'))
 
 
 def find_period(t,f,showfig=True,outputfolder='',starname=''):
@@ -34,6 +35,7 @@ def find_period(t,f,showfig=True,outputfolder='',starname=''):
            xlabel='period (days)',
            ylabel='Lomb-Scargle Power')
         ax.vlines(period, *ax.get_ylim(), linestyles='dotted', colors='r')
+        ax.set_title('best period: {0:.3f}'.format(period))
     pl.savefig(join(outputfolder, 'LombScargle_' + str(starname) + '.png'))
     return period
 
@@ -48,7 +50,7 @@ def estimate_k(t,f,p,showfig=False):
 
 def estimate_t0(t,f,tlower=None,tupper=None, showfig=False,outputfolder='',starname=''):
     if tlower is None and tupper is None:
-        tlower, tupper=t[0],t[100]
+        tlower, tupper=t[0],t[200]
     idx = (t > tlower) & (t < tupper)
     tsub, fsub = t[idx], f[idx]
     idx = fsub < np.median(fsub) - 0.5 * np.nanstd(fsub)
@@ -56,6 +58,7 @@ def estimate_t0(t,f,tlower=None,tupper=None, showfig=False,outputfolder='',starn
     if showfig:
         fig, ax = pl.subplots(1,1,figsize=(15,3))
         ax.plot(tsub, fsub, '.')
+        ax.set_title(starname)
         ax.vlines(t0, *ax.get_ylim())
     return t0
 
@@ -209,8 +212,7 @@ def get_period(t,f_t,get_mandelagolmodel=True,outputpath='',starname=''):#,param
     pl.plot(t_unravel[i],f_t_unravel[i],color='black',lw='1.5')
     i = i + 1
 
-  print('best period is ')
-  print(period)
+  print('best period is {}'.format(period))
 
   return folded,f_t_folded,period,freqlist,powers
 
@@ -219,6 +221,7 @@ def plot_tns(tns,t,f, f1=0.975, f2=0.98,outputfolder='',starname=''):
     fig, ax = pl.subplots(1,1,figsize=(15,5))
     ax.plot(t, f, '.')
     ax.vlines(tns, f1,f2)
+    ax.set_title(starname)
     pl.savefig(join(outputfolder, 'tns_' + str(starname) + '.png'))
 
 
@@ -227,11 +230,13 @@ def plot_folded_lc(t,f,period,t0,outputfolder='',starname=''):
 
     fig, ax = pl.subplots(1,1,figsize=(15,5))
     ax.plot(tf, ff, '.')
+    ax.set_title('Phase-folded lc before optimization'.format(starname))
     pl.savefig(join(outputfolder, 'folded_lc_' + str(starname) + '.png'))
 
 
-def estimate_t14():
-    return 0.01
+def estimate_t14(value=0.01):
+    if value:
+        return value
 
 ######################################
 from pytransit import MandelAgol
@@ -299,10 +304,12 @@ def plot_fit(theta,t,f,show_model=True,outputfolder='',starname=''):
     #ff /= np.median(ff)
 
     fig, ax = pl.subplots(1,1,figsize=(15,5))
-    ax.plot(tf, ff, '.')
+    ax.plot(tf, ff, '.', label='data')
     ax.set_xlabel('Phase')
     ax.set_ylabel('Normalized Flux')
     fmod=model_t(theta, t)
     ttmod,ffmod=fold(t,fmod,p,t0)
-    ax.plot(ttmod,ffmod,'r.-')
-    pl.savefig(join(outputfolder, 'folded_model_fit' + str(starname) + '.png'))
+    ax.plot(ttmod,ffmod,'r.-',label='model')
+    ax.set_title('Phase-folded with model fit (MLE): {}'.format(starname))
+    ax.legend()
+    pl.savefig(join(outputfolder, 'folded_model_optimized_fit' + str(starname) + '.png'))

@@ -1,0 +1,101 @@
+#!/usr/bin/env python
+
+from os.path import join, isfile, exists
+from os import makedirs
+import numpy as np
+import sys
+#import getpass
+import argparse
+import matplotlib.pyplot as pl
+import pandas as pd
+
+from k2crank.auxiliaries import *
+from k2crank.run_pipeline import run
+from k2crank.makelightcurve import *
+
+parser = argparse.ArgumentParser(description="""
+                simple planet finder""",
+                usage='use "%(prog)s --help" for more information',
+                formatter_class=argparse.RawTextHelpFormatter)
+parser.add_argument('-i', help='path to file',
+    type=str, default='./')
+parser.add_argument('-o', help='output directory (default: output/)',
+    type=str, default='output1/')
+parser.add_argument('-cutoff', help='cutoff limit for aperture size (default: 1.2)',
+    type=float, default=1.2)
+parser.add_argument('-showfig', help='show all plots',action='store_true',default=False)
+
+args = parser.parse_args()
+outputpath = args.o
+starname=args.cutoff
+showfig=args.showfig
+
+if isfile(args.i):
+    inputpath = args.i
+else:
+    print('{} does not exist'.format(args.i))
+    sys.exit()
+
+starname=inputpath.split('/')[-1].split('-')[0][4:-1]
+outputfolder=join(outputpath,starname)
+
+if exists(outputfolder):
+  ans = query_yes_no('overwrite contents of {}? (y/n)'.format(outputfolder))
+  if ans:
+      pass
+  else:
+      sys.exit()
+else:
+    makedirs(outputfolder)
+
+# if not exists(join(outputpath,starname)):
+#   makedirs(join(outputpath,starname))
+
+print('Checking {}'.format(starname))
+try:
+  t,f,x,y = makelc(inputpath=inputpath,outputpath=outputpath,chunksize=300,cutoff_limit=1.1, showfig=showfig)
+
+  #load raw lc output of makelc
+  print('loading raw lc')
+  df=load_df(outputpath,starname)
+  #plot
+  print('plotting raw lc')
+  plot_f_xy(df,outputfolder=outputfolder)
+  #normalize
+  print('normalizing data')
+  x=df.x/np.median(df.x)
+  y=df.y/np.median(df.y)
+  f=df.f/np.median(df.f)
+  t=df.t
+  #clip
+  print('clipping data')
+  t,f,x,y=astropy_sigma_clip(t,f,x,y,sigma=3)
+  #fit rbf
+  print('fitting Rbf')
+  function='quintic'
+  smooth=100
+  t_rbf,f_rbf=fit_rbf(t,f, function=function, smooth=smooth,outputfolder=outputfolder)
+  #detrended lc
+  print('detrending data')
+  t_rbf,f_rbf=plot_rbf(t,f,f_rbf,outputfolder=outputfolder)
+  head = '# detrended lc with Rbf ({}, {})\n #t, f'.format(function,smooth)
+  fname=join(outputpath,starname,'detrended_lc_' + str(starname) + '.txt')
+  np.savetxt(fname,np.c_[t_rbf,f_rbf],header=head,fmt='%f')
+  print('Saved: {}'.format(fname))
+  #ax.set_ylim(0.98,1.01)
+  #clip again
+  #t,f,x,y=astropy_sigma_clip(t,f,x,y,sigma=5)
+
+except Exception as inst:
+  print('Module failed: {}'.format(inst))
+
+if showfig:
+  pl.show()
+pl.close('all')
+
+#fname='parameter_' + starname + '.txt'
+#np.savetxt(fname,opt.x,comments=str(initial))
+
+print('-----------------------')
+print('          DONE')
+print('-----------------------\n')

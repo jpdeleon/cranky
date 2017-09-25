@@ -1,0 +1,112 @@
+#!/usr/bin/env python
+
+from os.path import join, isfile, exists
+from os import makedirs
+import numpy as np
+import sys
+#import getpass
+import argparse
+import matplotlib.pyplot as pl
+from k2crank.auxiliaries import *
+
+from k2crank.periodfinder import *
+from k2crank.findplanet import *
+
+#from k2crank.model_transits import *
+#import periodfinder
+#import model_transits
+
+from k2crank.run_pipeline import run
+
+parser = argparse.ArgumentParser(description="""
+                simple planet finder""",
+                usage='use "%(prog)s --help" for more information',
+                formatter_class=argparse.RawTextHelpFormatter)
+parser.add_argument('-i', help='path to file',
+    type=str, default='./')
+parser.add_argument('-o', help='output directory (default: output/)',
+    type=str, default='output2/')
+parser.add_argument('-name', help='star name',
+    type=str, default='', required=True)
+parser.add_argument('-showfig', help='show all plots',action='store_true',default=False)
+
+args = parser.parse_args()
+outputpath = args.o
+starname=args.name
+showfig=args.showfig
+
+if isfile(args.i):
+    inputpath = args.i
+else:
+    print('{} does not exist'.format(args.i))
+    sys.exit()
+
+outputfolder=join(outputpath,starname)
+
+if exists(outputfolder):
+  ans = query_yes_no('overwrite contents of {}? (y/n)'.format(outputfolder))
+  if ans:
+      pass
+  else:
+      sys.exit()
+else:
+    makedirs(outputfolder)
+
+print('Checking {}'.format(starname))
+try:
+  lc = np.loadtxt(inputpath,comments='#',delimiter=' ')
+
+  t,f=lc[:,0],lc[:,1]
+
+  plot_raw_lc(t,f,outputfolder=outputfolder,starname=starname)
+  print('checking period')
+  period=find_period(t,f,outputfolder=outputfolder,starname=starname)
+  print(period)
+  print('estimating k')
+  k=estimate_k(t,f,period)
+  print(k)
+  print('estimating t0')
+  t0 = estimate_t0(t,f,tlower=t[0],tupper=t[200],showfig=True,outputfolder=outputfolder,starname=starname)
+  print(t0)
+  print('calculate tns')
+  tns=get_tns(t, period, t0)
+  plot_tns(tns,t, f,f1=0.975,f2=0.98,outputfolder=outputfolder,starname=starname)
+  print('folding lc')
+  plot_folded_lc(t,f,period,t0,outputfolder=outputfolder,starname=starname)
+
+  p = period
+  t14 = estimate_t14()
+  k = estimate_k(t,f,p)
+  i = np.pi/2.
+  a = scaled_a(p, t14, k, i)
+  u1, u2 = 0.2, 0.2
+  sig = f.std()
+
+  initial = k,t0,p,a,i,u1,u2,sig,0,0,0,0
+  args = (t, f)
+  #import pdb; pdb.set_trace()
+
+  print('estimating transit parameters')
+  opt=fit_folded_lc(initial, args, method='powell')
+  plot_fit(opt.x,t,f,outputfolder=outputfolder,starname=starname)
+
+  #combo figure
+  folded,t_folded,period,freqlist,powers = get_period(t,f,outputpath=outputpath,starname=starname)
+
+  np.savetxt(join(outputpath, starname+'/powerspectrum_' + str(starname) + '.txt'),np.transpose([freqlist,powers]),header='Frequencies, Powers')
+
+  make_combo_figure(t,f,period,freqlist,powers,starname=starname,outputpath=outputpath)
+
+except Exception as inst:
+  print('Module failed: {}'.format(inst))
+
+if showfig:
+  pl.show() # comment out to keep things running for multiple stars
+pl.close('all')
+
+#fname='parameter_' + starname + '.txt'
+#np.savetxt(fname,opt.x,comments=str(initial))
+
+print('-----------------------')
+print('          DONE')
+print('-----------------------\n')

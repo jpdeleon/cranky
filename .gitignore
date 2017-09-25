@@ -1,6 +1,8 @@
 *.pyc
 **/data/
 **/output/
+**/output1/
+**/output2/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
