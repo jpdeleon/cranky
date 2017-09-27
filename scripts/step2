@@ -46,7 +46,7 @@ print(starname)
 outputfolder=join(outputpath,starname)
 
 if exists(outputfolder):
-  ans = query_yes_no('overwrite contents of {}? (y/n)'.format(outputfolder))
+  ans = query_yes_no('Directory not empty. Save output in {}? (y/n)'.format(outputfolder))
   if ans:
       pass
   else:
@@ -58,11 +58,14 @@ print('\n-----------------------')
 print('Analyzing {}'.format(starname))
 print('-----------------------\n')
 
+#method for MLE
+method='powell'
+
 try:
-  lc = np.loadtxt(inputpath,comments='#',delimiter=' ')
+  lc = np.loadtxt(inputpath,comments='#',delimiter='\t')
 
   t,f=lc[:,0],lc[:,1]
-
+  #print(len(t),len(f))
   plot_raw_lc(t,f,outputfolder=outputfolder,starname=starname)
   print('checking period')
   period=find_period(t,f,outputfolder=outputfolder,starname=starname)
@@ -92,7 +95,6 @@ try:
   #import pdb; pdb.set_trace()
 
   print('estimating transit parameters')
-  method='powell'
   opt=fit_folded_lc(initial, args, method=method)
   plot_fit(opt.x,t,f,outputfolder=outputfolder,starname=starname)
 
