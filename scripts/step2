@@ -1,5 +1,18 @@
 #!/usr/bin/env python
+'''
+After running `step1` script, this script follows.
+`step2` basically does the ff:
+* load the output of step1: detrended*.txt
+* searches for periodicity using LombScargle and plots it
+* esitmates t0 and k
+ - try changing: tupper=t[200]
+* calculates tns and plots it
+* phase-folds lightcurve given tns and period
+* estimates transit params using MLE
+ - try changing method: 'powell, neldermead, bfgs, cg'
+* plots the model given optimized params
 
+'''
 from os.path import join, isfile, exists
 from os import makedirs
 import numpy as np
@@ -42,11 +55,11 @@ else:
     sys.exit()
 
 starname=inputpath.split('/')[-1].split('_')[-1].split('.')[0]
-print(starname)
+#print(starname)
 outputfolder=join(outputpath,starname)
 
 if exists(outputfolder):
-  ans = query_yes_no('Directory not empty. Save output in {}? (y/n)'.format(outputfolder))
+  ans = query_yes_no('Directory not empty.\nSave output in {}?'.format(outputfolder))
   if ans:
       pass
   else:
@@ -55,42 +68,63 @@ else:
     makedirs(outputfolder)
 
 print('\n-----------------------')
-print('Analyzing {}'.format(starname))
+print('Analyzing EPIC {}'.format(starname))
 print('-----------------------\n')
 
 #method for MLE
 method='powell'
-
+use_BLS = True
 try:
-  lc = np.loadtxt(inputpath,comments='#',delimiter='\t')
+  lc = np.loadtxt(inputpath,comments='#',delimiter=' ', dtype=float)
 
   t,f=lc[:,0],lc[:,1]
   #print(len(t),len(f))
+
+  #optional: used for second-pass modeling
+  # try:
+  #     x,y=lc[:,2],lc[:,3]
+  # except:
+  #     print('No x, y column in the input file')
+
   plot_raw_lc(t,f,outputfolder=outputfolder,starname=starname)
   print('checking period')
-  period=find_period(t,f,outputfolder=outputfolder,starname=starname)
+  if use_BLS:
+      folded,t_folded,period,freqlist,powers = get_period(t,f,[],
+                                            get_mandelagolmodel=False,
+                                            outputpath=outputpath,
+                                            starname=starname)
+  else: #Lomb-Scargle periodogram
+      period,powers=find_period(t,f,outputfolder=outputfolder,starname=starname)
+
   print(period)
   print('estimating k')
   k=estimate_k(t,f,period)
   print(k)
   print('estimating t0')
-  t0 = estimate_t0(t,f,tlower=t[0],tupper=t[200],showfig=True,outputfolder=outputfolder,starname=starname)
+  t0 = estimate_t0(t,f,tlower=t[0],tupper=t[100],showfig=True,outputfolder=outputfolder,starname=starname)
   print(t0)
-  print('calculate tns')
+  print('calculating tns')
   tns=get_tns(t, period, t0)
   plot_tns(tns,t, f,f1=0.975,f2=0.98,outputfolder=outputfolder,starname=starname)
   print('folding lc')
   plot_folded_lc(t,f,period,t0,outputfolder=outputfolder,starname=starname)
 
   p = period
-  t14 = estimate_t14()
   k = estimate_k(t,f,p)
-  i = np.pi/2.
-  a = scaled_a(p, t14, k, i)
-  u1, u2 = 0.2, 0.2
+  b = 0.1
+  #estimate initial for t14
+  t14 = estimate_t14()
+  a_au = scaled_a(p, t14, k, b=b)
+  t14 = t14_circ(p, a_au, k, b=b)
+
+  #i = inclination(a_au, b=b) #np.pi/2.
+
+  #u1, u2 = 0.2, 0.2
+  #q1, q2=u_to_q(u1, u2)
+  q1,q2 = 0.2,0.2
   sig = f.std()
 
-  initial = k,t0,p,a,i,u1,u2,sig,0,0,0,0
+  initial = k,t0,p,a_au,b,q1,q2,sig
   args = (t, f)
   #import pdb; pdb.set_trace()
 
@@ -99,9 +133,8 @@ try:
   plot_fit(opt.x,t,f,outputfolder=outputfolder,starname=starname)
 
   #combo figure
-  folded,t_folded,period,freqlist,powers = get_period(t,f,opt.x,get_mandelagolmodel=False,outputpath=outputpath,starname=starname)
-
-  np.savetxt(join(outputpath, starname+'/powerspectrum_' + str(starname) + '.txt'),np.transpose([freqlist,powers]),header='Frequencies, Powers')
+  #folded,t_folded,period,freqlist,powers = get_period(t,f,opt.x,get_mandelagolmodel=True,outputpath=outputpath,starname=starname)
+  #np.savetxt(join(outputpath, starname+'/powerspectrum_' + str(starname) + '.txt'),np.transpose([freqlist,powers]),header='Frequencies, Powers')
 
   make_combo_figure(t,f,period,freqlist,powers,starname=starname,outputpath=outputpath)
 
@@ -112,15 +145,24 @@ if showfig:
   pl.show() # comment out to keep things running for multiple stars
 pl.close('all')
 
-names='k,t0,p,a,i,u1,u2,sig,c0,c1,c2,c3'.split(',')
-head = 'optimized values: MLE ({})\n {}'.format(method,names)
+names='k,t0,p,a,b,u1,u2,sig,inc,tshape,shape_lim,snr'.split(',')
+head = 'EPIC{}\noptimized values: MLE ({})\n {}'.format(starname,method,names)
 fname=join(outputpath,starname,'optimized_params_' + str(starname) + '.txt')
-#import pdb; pdb.set_trace()
-np.savetxt(fname,opt.x,header=head,fmt='%f')
+
+#calculate some useful params
+snr= np.max(powers)/np.median(powers)
+inc=np.rad2deg(inclination(a_au, b))
+tshape=tshape_approx(a_au, k, b)
+tshape_lim=max_k(tshape)
+
+data = np.concatenate((opt.x,[inc,tshape,tshape_lim,snr]),axis=0)
+np.savetxt(fname,data.reshape(1,-1),header=head,fmt='%f')
 print('Saved: {}'.format(fname))
 
-#fname='parameter_' + starname + '.txt'
-#np.savetxt(fname,opt.x,comments=str(initial))
+if snr > 4:
+    print('-------------------------------')
+    print('        SNR > {0:.3f}      '.format(snr))
+    print('-------------------------------')
 
 print('-----------------------')
 print('          DONE')

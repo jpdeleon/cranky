@@ -1,0 +1,13 @@
+
+multipanel plot
+* raw- input
+* full orbital phase
+* zoom transit primary, secondary
+* odd, even
+
+
+247589423
+
+southern bright stars
+sub-Neptune mass, close to Fulton gap, 1-1.5 R_E
+short-period

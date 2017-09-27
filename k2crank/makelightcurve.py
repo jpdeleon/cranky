@@ -74,6 +74,15 @@ def astropy_sigma_clip(t,f,x,y,sigma=3):
 from scipy.interpolate import Rbf
 
 def fit_rbf(t,f, function='quintic', smooth=100,outputfolder='',showfig=True):
+    '''
+    A class for radial basis function approximation/interpolation of
+    n-dimensional scattered data.
+    :param function: The radial basis function, based on the radius, r, given by the norm
+    :param smooth: Values greater than zero increase the smoothness of the
+    approximation.
+
+    100 is chosen by default such that short time-scale variability is not overfitted
+    '''
     rbfi = Rbf(t, f, function='quintic', smooth=100)
     if showfig:
         fig, ax = pl.subplots(1,1,figsize=(15,3))

@@ -1,6 +1,36 @@
 # general python files
 import numpy as np
 
+def inclination(a, b, e=None, w=None):
+    """
+    Winn 2014 ("Transits and Occultations"), eq. 7
+    """
+    # if e is None and w is None:
+    #     return np.arccos(b / a)
+    # elif e is not None and w is not None:
+    #     return np.arccos(b / a * (1 + e * np.sin(w)) / (1 - e**2))
+    # else:
+    #     return np.nan
+    return np.arccos(b / a)
+
+def q_to_u(q1, q2):
+    u1 = 2 * np.sqrt(q1) * q2
+    u2 = np.sqrt(q1) * (1 - 2*q2)
+    return u1, u2
+
+
+def u_to_q(u1, u2):
+    q1 = (u1 + u2)**2
+    q2 = u1 / (2 * (u1 + u2))
+    return q1, q2
+
+
+def impact_param(a,Rstar):
+    '''
+    a is semi-major axis, not scaled_a = R_star/a
+    '''
+    return a * np.cos(i)/Rstar
+
 def rebin_dataset(x,y,bin_size,medianbin=False):   ## FIXME calculate proper stdv in case of medianbinning
   #
   # Auxiliary function to do a binning, either mean or median

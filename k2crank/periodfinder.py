@@ -26,12 +26,12 @@ def fold_data(t,y,period):
   return t_folded,y_folded
 
 
-def get_period(t,f_t,params,get_mandelagolmodel=True,outputpath='',starname=''):
-  print(params)
-  #
-  # here we use a BLS algorithm to create a periodogram and find the best periods.
-  # The BLS is implemented in Python by Ruth Angus and Dan Foreman-Mackey
-  #
+def get_period(t,f_t,params=[],get_mandelagolmodel=True,outputpath='',starname=''):
+  '''
+  Uses a BLS algorithm to create a periodogram and find the best periods
+  The BLS is implemented in Python by Ruth Angus and Dan Foreman-Mackey.
+  '''
+  #print(params)
 
   outputfolder = os.path.join(outputpath,str(starname))
 
@@ -46,8 +46,7 @@ def get_period(t,f_t,params,get_mandelagolmodel=True,outputpath='',starname=''):
   u = np.linspace(fmin,fmin + nf*df,nf)
   v = np.array(0)
   t = np.array(t)
-  print('t0=')
-  print(t[0])
+  #print('t0=',t[0])
   f_t = np.array(f_t)
 
   t_orig = np.copy(t)
@@ -75,12 +74,12 @@ def get_period(t,f_t,params,get_mandelagolmodel=True,outputpath='',starname=''):
     #[T0,b,R_over_a,Rp_over_Rstar,flux_star,gamma1,gamma2]
     #transit_params = np.array([3073.97854305,0.1,0.104,0.095118,1.,0.2,0.2])
     #import pdb; pdb.set_trace()
-    k,t0,p,a_scaled,i,u1,u2,sig,c0,c1,c2,c3=params
-    b=0.1
+    k,t0,p,a_au,b,q1,q2,sig=params
+    u1,u2=q_to_u(q1,q2)
     flux_star = 1.0
     Rstar=1.0 #solar-radius
-    a=Rstar/a_scaled
-    transit_params = np.array([t0,0.1,a,k,1.0,u1,u2])
+    a=Rstar/a_au
+    transit_params = np.array([t0,0.1,a_au,k,1.0,u1,u2])
 
     print(transit_params)
 
@@ -99,7 +98,7 @@ def get_period(t,f_t,params,get_mandelagolmodel=True,outputpath='',starname=''):
     pl.tick_params(axis='both', which='major', width=1.5)
     pl.tight_layout()
     pl.setp(legend.get_title(),fontsize=17)
-  #pl.savefig(os.path.join(outputfolder, 'folded_P_' + str(starname) + '.png'))
+  pl.savefig(os.path.join(outputfolder, 'folded_P_' + str(starname) + '.png'))
 
   # unravel again
   n_start = int(np.round(t[0] / period))
