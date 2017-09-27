@@ -67,7 +67,7 @@ def get_pixelfluxes(inputfolder='',outputfolder='',starname=''):
     i = i +1
   #print dates,fluxes'''
 
-  rec = pixfile[1].data
+  rec = pixfile[1].data #hdu.table.BinTableHDU
   dates=rec.TIME
   fluxes=rec.RAW_CNTS
 
