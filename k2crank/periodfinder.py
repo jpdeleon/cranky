@@ -26,10 +26,16 @@ def fold_data(t,y,period):
   return t_folded,y_folded
 
 
-def get_period(t,f_t,params=[],get_mandelagolmodel=True,outputpath='',starname=''):
+def get_period(t,f_t,params=[],get_mandelagolmodel=True,outputpath='',starname='',showfig=True):
   '''
   Uses a BLS algorithm to create a periodogram and find the best periods
   The BLS is implemented in Python by Ruth Angus and Dan Foreman-Mackey.
+
+  power is nf-dimensional power spectrum array at frequencies f = fmin + arange(nf) * df
+  best_period is period in the same units as time
+  best_power is the power at best_period,
+  depth is the depth of the transit at best_period,
+  q is the fractional transit duration
   '''
   #print(params)
 
@@ -68,6 +74,23 @@ def get_period(t,f_t,params=[],get_mandelagolmodel=True,outputpath='',starname='
   pl.xlabel('Time [d]')
   pl.ylabel('Relative Flux')
 
+  if showfig:
+      pass
+  ## FIXME BLS does not output multiple periods
+  #
+  #     idx2 = np.argmax(powers[idx1])
+  #     period = periods[idx1][idx2]
+  #
+  #     fig, ax = pl.subplots(1,1,figsize=(15,5))
+  #     ax.plot(periods, powers, 'k-')
+  #     ax.set(xlim=(0.5, 5),
+  #     #         , ylim=(0, 0.01),
+  #        xlabel='period (days)',
+  #        ylabel='Lomb-Scargle Power')
+  #     ax.vlines(period, *ax.get_ylim(), linestyles='dotted', colors='r')
+  #     ax.set_title('best period: {0:.3f}'.format(period))
+  # pl.savefig(join(outputfolder, 'BLS_' + str(starname) + '.png'))
+
   if get_mandelagolmodel:
     # this is not a core part of the module and uses a transit model by Mandel & Agol, implemented in Python by Ian Crossfield.
 
@@ -81,7 +104,7 @@ def get_period(t,f_t,params=[],get_mandelagolmodel=True,outputpath='',starname='
     a=Rstar/a_au
     transit_params = np.array([t0,0.1,a_au,k,1.0,u1,u2])
 
-    print(transit_params)
+    #print(transit_params)
 
     import model_transits
     times_full = np.linspace(0.,period,10000)
@@ -116,8 +139,8 @@ def get_period(t,f_t,params=[],get_mandelagolmodel=True,outputpath='',starname='
     pl.plot(t_unravel[i],f_t_unravel[i],color='black',lw='1.5')
     i = i + 1
 
-  print('best period is ')
-  print(period)
+  #print('best period is ')
+  #print(period)
 
   return folded,f_t_folded,period,freqlist,powers
 

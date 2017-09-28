@@ -40,7 +40,7 @@ starname=inputpath.split('/')[-1].split('-')[0][4:-1]
 outputfolder=join(outputpath,starname)
 
 if exists(outputfolder):
-  ans = query_yes_no('overwrite contents of {}? (y/n)'.format(outputfolder))
+  ans = query_yes_no('overwrite contents of {}?'.format(outputfolder))
   if ans:
       pass
   else:
@@ -101,9 +101,6 @@ except Exception as inst:
 if showfig:
   pl.show()
 pl.close('all')
-
-#fname='parameter_' + starname + '.txt'
-#np.savetxt(fname,opt.x,comments=str(initial))
 
 print('-----------------------')
 print('          DONE')
