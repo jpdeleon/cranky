@@ -1,0 +1,7 @@
+numpy
+matplotlib
+pandas
+gatspy
+pytransit
+astropy
+scipy

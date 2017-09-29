@@ -70,7 +70,7 @@ def estimate_t0(t,f,tlower=None,tupper=None, showfig=False,outputfolder='',starn
         ax.vlines(t0, *ax.get_ylim())
         #ax.set_title(starname)
         ax.set_title('t0= {0:.3f}'.format(t0))
-    pl.savefig(join(outputfolder, 't0_' + str(starname) + '.png'))
+    pl.savefig(join(outputfolder, str(starname) +'_t0.png'))
     return t0
 
 
@@ -413,7 +413,8 @@ def summarize(initial,args,freqlist=None,powers=None,minimum=3,outputfolder='',s
 
     tt,ff = fold(t,f,p,t0)
     #adjust t0 to search near phase = 0
-    t0_fold=estimate_t0(tt,ff, tlower=tt[len(tt)/2-30], tupper=tt[len(tt)/2+30])
+    t0_fold=estimate_t0(tt,ff, tlower=tt[len(tt)/2-30], tupper=tt[len(tt)/2+30],
+                        outputfolder=outputfolder,starname=starname, showfig=True)
     initial_fold = k,t0_fold,p,a_au,b,q1,q2,sig
     args_fold = (tt, ff)
 
@@ -428,6 +429,8 @@ def summarize(initial,args,freqlist=None,powers=None,minimum=3,outputfolder='',s
     print('bls periodogram done')
     if freqlist is None or powers is None: #use_BLS:
         folded,t_folded,period,freqlist,powers = get_period(t,f,[],
+                                                    #showfig=True,
+                                                    starname=starname,
                                                     get_mandelagolmodel=False)
     else:
         pass

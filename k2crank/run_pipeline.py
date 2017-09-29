@@ -37,15 +37,15 @@ def run(inputpath='',outputpath='',makelightcurve=True, find_transits=True,chunk
     outputlightcurvefolder = os.path.join(outputfolder,'lcs/') # one may want to put the LCs in a different folder e.g. to keep all together
     if not os.path.exists(outputlightcurvefolder):
       os.makedirs(outputlightcurvefolder)
-    np.savetxt(os.path.join(outputlightcurvefolder, 'centroiddetrended_lightcurve_' + str(starname) + '.txt'),np.transpose([t,f_t]),header='Time, Flux')
+    np.savetxt(os.path.join(outputlightcurvefolder, str(starname) + '_centroiddetrended_lightcurve.txt'),np.transpose([t,f_t]),header='Time, Flux')
 
   else:
     outputlightcurvefolder = os.path.join(os.path.join(outputpath,str(starname)),'lcs')
-    [t,f_t] = np.loadtxt(os.path.join(outputlightcurvefolder, 'centroiddetrended_lightcurve_' + str(starname) + '.txt'),unpack=True,usecols=(0,1))
+    [t,f_t] = np.loadtxt(os.path.join(outputlightcurvefolder, str(starname) + '_centroiddetrended_lightcurve.txt'),unpack=True,usecols=(0,1))
 
   if find_transits:
     folded,f_t_folded,period,freqlist,powers = periodfinder.get_period(t,f_t,outputpath=outputpath,starname=starname,get_mandelagolmodel=False)
-    np.savetxt(os.path.join(outputfolder, 'powerspectrum_' + str(starname) + '.txt'),np.transpose([freqlist,powers]),header='Frequencies, Powers')
+    np.savetxt(os.path.join(outputfolder, str(starname) + '_powerspectrum.txt'),np.transpose([freqlist,powers]),header='Frequencies, Powers')
 
     periodfinder.make_combo_figure(t,f_t,period,freqlist,powers,starname=starname,outputpath=outputpath)
 

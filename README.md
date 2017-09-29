@@ -33,6 +33,9 @@ $ step2 -i '/output/starname/*detrended_lc_<starname>.txt'
 
 ## Notes
 
+09/28
+* created summary/ quick-look figure
+ 
 09/25
 * created scripts:
   * `step1` for simple sigma clipping and detrending

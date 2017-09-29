@@ -41,7 +41,7 @@ setup(
     long_description=rd("README.md") + "\n\n"
                     + "---------\n\n",
     package_dir={"k2photometry": "k2crank"},
-    scripts=['scripts/crank','scripts/step1','scripts/step2'],
+    scripts=['scripts/crank','scripts/step1','scripts/step2','scripts/step2-everest'],
     include_package_data=True,
     keywords=['k2','transit photometry'],
     classifiers = [
