@@ -21,7 +21,6 @@ import sys
 import argparse
 import matplotlib.pyplot as pl
 from k2crank.auxiliaries import *
-
 from k2crank.periodfinder import *
 from k2crank.findplanet import *
 
@@ -44,29 +43,8 @@ outputpath = args.o
 #starname=args.name
 showfig=args.showfig
 
-if isfile(args.i):
-    inputpath = args.i
-else:
-    print('{} does not exist'.format(args.i))
-    sys.exit()
+inputpath = args.i
 
-everest_lc=True
-if everest_lc:
-        starname=inputpath.split('/')[-1].split('-')[0].split('.')[0]
-else: #cranky_lc
-    starname=inputpath.split('/')[-1].split('_')[0].split('.')[0]
-#print(starname)
-outputfolder=join(outputpath,starname)
-
-if exists(outputfolder):
-    ans = query_yes_no('Directory not empty.\nSave output in {}?'.format(outputfolder))
-    if ans:
-        pass
-    else:
-        sys.exit()
-else:
-    makedirs(outputfolder)
-    
 starnames = [ f[4:13] for f in listdir(inputpath) if isfile(join(inputpath,f)) ]
 
 
