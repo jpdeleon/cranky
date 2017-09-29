@@ -9,6 +9,7 @@ import argparse
 import matplotlib.pyplot as pl
 import pandas as pd
 
+sys.path.append('..')
 from k2crank.auxiliaries import *
 from k2crank.run_pipeline import run
 from k2crank.makelightcurve import *

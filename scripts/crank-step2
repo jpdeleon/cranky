@@ -20,8 +20,9 @@ import sys
 #import getpass
 import argparse
 import matplotlib.pyplot as pl
-from k2crank.auxiliaries import *
 
+sys.path.append('..')
+from k2crank.auxiliaries import *
 from k2crank.periodfinder import *
 from k2crank.findplanet import *
 
