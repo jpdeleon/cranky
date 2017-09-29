@@ -40,11 +40,11 @@ starname=inputpath.split('/')[-1].split('-')[0][4:-1]
 outputfolder=join(outputpath,starname)
 
 if exists(outputfolder):
-  ans = query_yes_no('overwrite contents of {}?'.format(outputfolder))
-  if ans:
-      pass
-  else:
-      sys.exit()
+    ans = query_yes_no('overwrite contents of {}?'.format(outputfolder))
+    if ans:
+        pass
+    else:
+        sys.exit()
 else:
     makedirs(outputfolder)
 
@@ -55,51 +55,51 @@ print('\n-----------------------')
 print('Checking EPIC {}'.format(starname))
 print('-----------------------\n')
 try:
-  t,f,x,y = makelc(inputpath=inputpath,outputpath=outputpath,chunksize=300,cutoff_limit=1.1, showfig=showfig)
+    t,f,x,y = makelc(inputpath=inputpath,outputpath=outputpath,chunksize=300,cutoff_limit=1.1, showfig=showfig)
 
-  #load raw lc output of makelc
-  print('loading raw lc')
-  df=load_df(outputpath,starname)
+    #load raw lc output of makelc
+    print('loading raw lc')
+    df=load_df(outputpath,starname)
 
-  #plot
-  print('plotting raw lc')
-  plot_f_xy(df,outputfolder=outputfolder)
+    #plot
+    print('plotting raw lc')
+    plot_f_xy(df,outputfolder=outputfolder)
 
-  #normalize
-  print('normalizing data')
-  x=df.x/np.median(df.x)
-  y=df.y/np.median(df.y)
-  f=df.f/np.median(df.f)
-  t=df.t
+    #normalize
+    print('normalizing data')
+    x=df.x/np.median(df.x)
+    y=df.y/np.median(df.y)
+    f=df.f/np.median(df.f)
+    t=df.t
 
-  #clip
-  print('clipping data')
-  t,f,x,y=astropy_sigma_clip(t,f,x,y,sigma=3)
+    #clip
+    print('clipping data')
+    t,f,x,y=astropy_sigma_clip(t,f,x,y,sigma=3)
 
-  #fit rbf
-  print('fitting Rbf')
-  function='quintic'
-  smooth=100
-  t_rbf,f_rbf=fit_rbf(t,f, function=function, smooth=smooth,outputfolder=outputfolder)
+    #fit rbf
+    print('fitting Rbf')
+    function='quintic'
+    smooth=100
+    t_rbf,f_rbf=fit_rbf(t,f, function=function, smooth=smooth,outputfolder=outputfolder)
 
-  #detrended lc
-  print('detrending data')
-  t_rbf,f_rbf=plot_rbf(t,f,f_rbf,outputfolder=outputfolder)
+    #detrended lc
+    print('detrending data')
+    t_rbf,f_rbf=plot_rbf(t,f,f_rbf,outputfolder=outputfolder)
 
-  #save output
-  head = 'detrended lc with Rbf ({}, {})\nt, f, x, y'.format(function,smooth)
-  fname=join(outputpath,starname,'detrended_lc_' + str(starname) + '.txt')
-  np.savetxt(fname,np.c_[t_rbf,f_rbf,x,y],header=head,fmt='%f')
-  print('Saved: {}'.format(fname))
-  #ax.set_ylim(0.98,1.01)
-  #clip again
-  #t,f,x,y=astropy_sigma_clip(t,f,x,y,sigma=5)
+    #save output
+    head = 'detrended lc with Rbf ({}, {})\nt, f, x, y'.format(function,smooth)
+    fname=join(outputpath,starname,'detrended_lc_' + str(starname) + '.txt')
+    np.savetxt(fname,np.c_[t_rbf,f_rbf,x,y],header=head,fmt='%f')
+    print('Saved: {}'.format(fname))
+    #ax.set_ylim(0.98,1.01)
+    #clip again
+    #t,f,x,y=astropy_sigma_clip(t,f,x,y,sigma=5)
 
 except Exception as inst:
-  print('Module failed: {}'.format(inst))
+    print('Module failed: {}'.format(inst))
 
 if showfig:
-  pl.show()
+    pl.show()
 pl.close('all')
 
 print('-----------------------')

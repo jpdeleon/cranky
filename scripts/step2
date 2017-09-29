@@ -59,11 +59,11 @@ starname=inputpath.split('/')[-1].split('_')[-1].split('.')[0]
 outputfolder=join(outputpath,starname)
 
 if exists(outputfolder):
-  ans = query_yes_no('Directory not empty.\nSave output in {}?'.format(outputfolder))
-  if ans:
-      pass
-  else:
-      sys.exit()
+    ans = query_yes_no('Directory not empty.\nSave output in {}?'.format(outputfolder))
+    if ans:
+        pass
+    else:
+        sys.exit()
 else:
     makedirs(outputfolder)
 
@@ -75,71 +75,71 @@ print('-----------------------\n')
 method='powell'
 use_BLS = True
 try:
-  lc = np.loadtxt(inputpath,comments='#',delimiter=' ', dtype=float)
+    lc = np.loadtxt(inputpath,comments='#',delimiter=' ', dtype=float)
 
-  t,f=lc[:,0],lc[:,1]
-  #print(len(t),len(f))
+    t,f=lc[:,0],lc[:,1]
+    #print(len(t),len(f))
 
-  #optional: used for second-pass modeling
-  # try:
-  #     x,y=lc[:,2],lc[:,3]
-  # except:
-  #     print('No x, y column in the input file')
+    #optional: used for second-pass modeling
+    # try:
+    #     x,y=lc[:,2],lc[:,3]
+    # except:
+    #     print('No x, y column in the input file')
 
-  plot_raw_lc(t,f,outputfolder=outputfolder,starname=starname)
-  print('checking period')
-  if use_BLS:
-      folded,t_folded,period,freqlist,powers = get_period(t,f,[],
+    plot_raw_lc(t,f,outputfolder=outputfolder,starname=starname)
+    print('checking period')
+    if use_BLS:
+        folded,t_folded,period,freqlist,powers = get_period(t,f,[],
                                             get_mandelagolmodel=False,
                                             outputpath=outputpath,
                                             starname=starname)
-  else: #Lomb-Scargle periodogram
-      period,powers=find_period(t,f,outputfolder=outputfolder,starname=starname)
+    else: #Lomb-Scargle periodogram
+        period,powers=find_period(t,f,outputfolder=outputfolder,starname=starname)
 
-  print(period)
-  print('estimating k')
-  k=estimate_k(t,f,period)
-  print(k)
-  print('estimating t0')
-  t0 = estimate_t0(t,f,tlower=t[0],tupper=t[150],showfig=True,outputfolder=outputfolder,starname=starname)
-  print(t0)
-  print('calculating tns')
-  tns=get_tns(t, period, t0)
-  plot_tns(tns,t, f,f1=0.975,f2=0.98,outputfolder=outputfolder,starname=starname)
-  print('folding lc')
-  plot_folded_lc(t,f,period,t0,outputfolder=outputfolder,starname=starname)
+    print(period)
+    print('estimating k')
+    k=estimate_k(t,f,period)
+    print(k)
+    print('estimating t0')
+    t0 = estimate_t0(t,f,tlower=t[0],tupper=t[150],showfig=True,outputfolder=outputfolder,starname=starname)
+    print(t0)
+    print('calculating tns')
+    tns=get_tns(t, period, t0)
+    plot_tns(tns,t, f,f1=0.975,f2=0.98,outputfolder=outputfolder,starname=starname)
+    print('folding lc')
+    plot_folded_lc(t,f,period,t0,outputfolder=outputfolder,starname=starname)
 
-  p = period
-  k = estimate_k(t,f,p)
-  b = 0.1
-  #estimate initial for t14
-  t14 = estimate_t14()
-  a_au = scaled_a(p, t14, k, b=b)
-  t14 = t14_circ(p, a_au, k, b=b)
-  #i = inclination(a_au, b=b) #np.pi/2.
+    p = period
+    k = estimate_k(t,f,p)
+    b = 0.1
+    #estimate initial for t14
+    t14 = estimate_t14()
+    a_au = scaled_a(p, t14, k, b=b)
+    t14 = t14_circ(p, a_au, k, b=b)
+    #i = inclination(a_au, b=b) #np.pi/2.
 
-  q1,q2 = 0.2,0.2
-  sig = f.std()
+    q1,q2 = 0.2,0.2
+    sig = f.std()
 
-  initial = k,t0,p,a_au,b,q1,q2,sig
-  args = (t, f)
+    initial = k,t0,p,a_au,b,q1,q2,sig
+    args = (t, f)
 
-  print('estimating transit parameters')
-  opt=fit_folded_lc(initial, args, method=method)
-  rms=plot_fit(opt.x,t,f,outputfolder=outputfolder,starname=starname)
+    print('estimating transit parameters')
+    opt=fit_folded_lc(initial, args, method=method)
+    rms=plot_fit(opt.x,t,f,outputfolder=outputfolder,starname=starname)
 
-  print('\ncreating summary figure')
-  summarize(opt.x,args,minimum=3,outputfolder=outputfolder,starname=starname)
-  #combo figure
-  #folded,t_folded,period,freqlist,powers = get_period(t,f,opt.x,get_mandelagolmodel=True,outputpath=outputpath,starname=starname)
-  #np.savetxt(join(outputpath, starname+'/powerspectrum_' + str(starname) + '.txt'),np.transpose([freqlist,powers]),header='Frequencies, Powers')
-  #make_combo_figure(t,f,period,freqlist,powers,starname=starname,outputpath=outputpath)
+    print('\ncreating summary figure')
+    summarize(opt.x,args,minimum=3,outputfolder=outputfolder,starname=starname)
+    #combo figure
+    #folded,t_folded,period,freqlist,powers = get_period(t,f,opt.x,get_mandelagolmodel=True,outputpath=outputpath,starname=starname)
+    #np.savetxt(join(outputpath, starname+'/powerspectrum_' + str(starname) + '.txt'),np.transpose([freqlist,powers]),header='Frequencies, Powers')
+    #make_combo_figure(t,f,period,freqlist,powers,starname=starname,outputpath=outputpath)
 
 except Exception as inst:
-  print('Module failed: {}'.format(inst))
+    print('Module failed: {}'.format(inst))
 
 if showfig:
-  pl.show() # comment out to keep things running for multiple stars
+    pl.show() # comment out to keep things running for multiple stars
 pl.close('all')
 
 names='k,t0,p,a,b,u1,u2,sigma,inc,tshape,k_max,snr,rms'.split(',')
