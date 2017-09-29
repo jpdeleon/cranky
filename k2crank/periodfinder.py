@@ -64,8 +64,8 @@ def get_period(t,f_t,params=[],get_mandelagolmodel=True,outputpath='',starname='
 
   folded,f_t_folded = fold_data(t,f_t,period)
 
-  np.savetxt(os.path.join(outputfolder, 'folded_P' + str(period) + 'star_' + str(starname) + '.txt'),
-                        np.transpose([folded,f_t_folded]),header='Time, Flux')
+  # np.savetxt(os.path.join(outputfolder, 'folded_P' + str(period) + 'star_' + str(starname) + '.txt'),
+  #                       np.transpose([folded,f_t_folded]),header='Time, Flux')
 
   t_foldbin,f_t_foldbin,stdv_foldbin = rebin_dataset(folded,f_t_folded,15)
   f_t_smooth = savitzky_golay(f_t_folded,29,1)
@@ -121,7 +121,7 @@ def get_period(t,f_t,params=[],get_mandelagolmodel=True,outputpath='',starname='
     pl.tick_params(axis='both', which='major', width=1.5)
     pl.tight_layout()
     pl.setp(legend.get_title(),fontsize=17)
-  pl.savefig(os.path.join(outputfolder, 'folded_P_' + str(starname) + '.png'))
+  #pl.savefig(os.path.join(outputfolder, str(starname) + '_folded_P.png'))
 
   # unravel again
   n_start = int(np.round(t[0] / period))

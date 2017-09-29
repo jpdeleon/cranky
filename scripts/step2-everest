@@ -1,0 +1,93 @@
+#!/usr/bin/env python
+'''
+After running `step1` script, this script follows.
+`step2` basically does the ff:
+* load the output of step1: detrended*.txt
+* searches for periodicity using LombScargle and plots it
+* esitmates t0 and k
+ - try changing: tupper=t[200]
+* calculates tns and plots it
+* phase-folds lightcurve given tns and period
+* estimates transit params using MLE
+ - try changing method: 'powell, neldermead, bfgs, cg'
+* plots the model given optimized params
+
+'''
+from os.path import join, isfile, exists
+from os import makedirs
+import numpy as np
+import sys
+#import getpass
+import argparse
+import matplotlib.pyplot as pl
+from k2crank.auxiliaries import *
+
+from k2crank.periodfinder import *
+from k2crank.findplanet import *
+
+from os import listdir
+from os.path import isfile, join
+
+
+parser = argparse.ArgumentParser(description="""
+                simple planet finder""",
+                usage='use "%(prog)s --help" for more information',
+                formatter_class=argparse.RawTextHelpFormatter)
+parser.add_argument('-i', help='path to file',
+    type=str, default='./')
+parser.add_argument('-o', help='output directory (default: output/)',
+    type=str, default='output2/')
+parser.add_argument('-showfig', help='show all plots',action='store_true',default=False)
+
+args = parser.parse_args()
+outputpath = args.o
+#starname=args.name
+showfig=args.showfig
+
+if isfile(args.i):
+    inputpath = args.i
+else:
+    print('{} does not exist'.format(args.i))
+    sys.exit()
+
+everest_lc=True
+if everest_lc:
+        starname=inputpath.split('/')[-1].split('-')[0].split('.')[0]
+else: #cranky_lc
+    starname=inputpath.split('/')[-1].split('_')[0].split('.')[0]
+#print(starname)
+outputfolder=join(outputpath,starname)
+
+if exists(outputfolder):
+    ans = query_yes_no('Directory not empty.\nSave output in {}?'.format(outputfolder))
+    if ans:
+        pass
+    else:
+        sys.exit()
+else:
+    makedirs(outputfolder)
+    
+starnames = [ f[4:13] for f in listdir(inputpath) if isfile(join(inputpath,f)) ]
+
+
+i = 0
+exc_list = []
+while i < len(starnames):
+  print 'Now running stars, number '
+  print str(i)
+
+  try:
+    print(starname)
+
+  except Exception as inst:
+    print inst
+    exc_list.append(inst)
+  i = i + 1
+
+if exc_list:
+  print 'Module failed for some stars:'
+  print exc_list
+
+print('-----------------------')
+print('        {}  DONE\n'.format(starname))
+print('-----------------------\n')

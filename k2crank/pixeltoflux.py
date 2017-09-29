@@ -45,7 +45,7 @@ def get_pixelfluxes(inputfolder='',outputfolder='',starname=''):
 
   obj_basics = [keplerid,kepmag,obsmode,channel,module,RA,DEC]
   obj_basics_head = '# 0 kepid, 1 kepmag, 2 obsmode, 3 channel, 4 module, 5 RA, 6 DEC'
-  np.savetxt(os.path.join(outputfolder,'obj_basics_' + str(starname) + '.txt'),obj_basics,header=obj_basics_head,fmt='%s')
+  np.savetxt(os.path.join(outputfolder,str(starname) +'_obj_basics.txt'),obj_basics,header=obj_basics_head,fmt='%s')
 
 
   # read dates and fluxes
@@ -261,7 +261,7 @@ def overwrite_centroids(centroidstar='',outputpath=''):
   # little module to overwrite centroids, can be used to take the centroid position of another star or average of stars (not used currently)
 
   folder = os.path.join(outputpath,centroidstar)
-  t,Xc,Yc = np.loadtxt(os.path.join(folder,'centroids_' + str(centroidstar) + '.txt'),unpack=True)
+  t,Xc,Yc = np.loadtxt(os.path.join(folder, str(centroidstar) +'_centroids.txt'),unpack=True)
 
   return Xc,Yc
 
@@ -318,8 +318,8 @@ def gotoflux(inputpath='',outputpath='',cutoff_limit=2., showfig=None):#,campaig
   #t,f_t,Xc,Yc = remove_known_outliers(t,f_t,Xc,Yc)
   t,f_t,Xc,Yc = remove_known_outliers(t,f_t,Xc,Yc)
 
-  np.savetxt(os.path.join(outputfolder,'lightcurve_raw_' + str(starname) + '.txt'),np.transpose([t,f_t,Xc,Yc]),header='Time, flux, Xc, Yc')
-  np.savetxt(os.path.join(outputfolder,'centroids_' + str(starname) + '.txt'),np.transpose([t,Xc,Yc]),header='Time, Xc, Yc')
+  np.savetxt(os.path.join(outputfolder, str(starname) + '_lightcurve_raw.txt'),np.transpose([t,f_t,Xc,Yc]),header='Time, flux, Xc, Yc')
+  np.savetxt(os.path.join(outputfolder, str(starname) + '_centroids.txt'),np.transpose([t,Xc,Yc]),header='Time, Xc, Yc')
 
 
   return [t,f_t,Xc,Yc]

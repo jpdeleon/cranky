@@ -88,7 +88,7 @@ try:
 
     #save output
     head = 'detrended lc with Rbf ({}, {})\nt, f, x, y'.format(function,smooth)
-    fname=join(outputpath,starname,'detrended_lc_' + str(starname) + '.txt')
+    fname=join(outputpath,starname, str(starname) + '_detrended_lc.txt')
     np.savetxt(fname,np.c_[t_rbf,f_rbf,x,y],header=head,fmt='%f')
     print('Saved: {}'.format(fname))
     #ax.set_ylim(0.98,1.01)

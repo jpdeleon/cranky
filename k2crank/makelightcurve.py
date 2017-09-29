@@ -30,7 +30,7 @@ def makelc(inputpath='',outputpath='', find_transits=True,chunksize=300,cutoff_l
 from astropy.stats import sigma_clip
 
 def load_df(outputpath,starname,sigma_upper=2,sigma_lower=10):
-    fname='lightcurve_raw_'+starname+'.txt'
+    fname=starname+'_lightcurve_raw.txt'
     txtfile=join(outputpath,starname,fname)
     print(txtfile)
     df = pd.read_csv(txtfile, skiprows=1, delimiter=' ', names=['t','f','x','y'])
@@ -83,7 +83,7 @@ def fit_rbf(t,f, function='quintic', smooth=100,outputfolder='',showfig=True):
 
     100 is chosen by default such that short time-scale variability is not overfitted
     '''
-    rbfi = Rbf(t, f, function='quintic', smooth=100)
+    rbfi = Rbf(t, f, function=function, smooth=smooth)
     if showfig:
         fig, ax = pl.subplots(1,1,figsize=(15,3))
         ax.plot(t, f, '.')
